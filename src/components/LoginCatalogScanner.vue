@@ -125,7 +125,7 @@
       <h5>3️⃣ カタログスキャナー bot を使用する</h5>
       <ol>
         <li>
-          <a href="http://discord.gg/acnhhub" target="_blank" rel="noopener"
+          <a href="https://discord.gg/6T49ChZY3S" target="_blank" rel="noopener"
             >ACNH Hub Discord サーバー</a
           >に参加します。
         </li>
