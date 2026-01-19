@@ -631,7 +631,7 @@ const navs = [
         subtext: "1, 4, 7, 10月",
         order: 3,
         filter: function (item) {
-          return item.seasonEvent === "Fishing Tourney";
+          return item.seasonEvent?.includes("Fishing Tourney");
         },
       },
       {
@@ -640,7 +640,7 @@ const navs = [
         subtext: "6, 7, 8, 9月",
         order: 4,
         filter: function (item) {
-          return item.seasonEvent === "Bug-Off";
+          return item.seasonEvent?.includes("Bug-Off");
         },
       },
       {
@@ -649,7 +649,7 @@ const navs = [
         subtext: "8月",
         order: 5,
         filter: function (item) {
-          return item.seasonEvent === "Fireworks Show";
+          return item.seasonEvent?.includes("Fireworks Show");
         },
       },
       {
