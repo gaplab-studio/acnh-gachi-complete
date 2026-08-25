@@ -106,9 +106,14 @@ export default {
         const payload = JSON.parse(json);
         const collected = this.$store.getters.localCollectedData || {};
         const updates = {};
+        let matched = 0;
+        let eligible = 0;
         Object.entries(payload).forEach(([name, value]) => {
           const item = itemsJson.find((candidate) => candidate.name === name);
-          if (value === "0" && item && (item.variants || []).length === 1) {
+          if (item) matched += 1;
+          const itemLength = item && item.variants ? item.variants.length : 1;
+          if (value === "0" && item && itemLength === 1) {
+            eligible += 1;
             const key = item.uniqueEntryId || item.name;
             if (!collected[key]) updates[key] = "0";
           }
@@ -119,7 +124,7 @@ export default {
             collectedArray: Object.values(updates),
           });
         }
-        this.g001ImportSummary = `CatalogScannerから${Object.keys(updates).length}件を取得済みに追加しました。`;
+        this.g001ImportSummary = `CatalogScannerから${Object.keys(updates).length}件を取得済みに追加しました。（照合${matched}件・反映対象${eligible}件）`;
       } catch (error) {
         this.g001ImportSummary = "CatalogScannerの反映データを読み込めませんでした。もう一度「ガチコンプへ反映」を実行してください。";
       } finally {
