@@ -98,9 +98,10 @@ export default {
     },
     importG001Fragment() {
       const match = window.location.hash.match(/^#g001=([A-Za-z0-9_-]+)$/);
-      if (!match) return;
+      const encodedPayload = window.__G001_IMPORT_FRAGMENT__ || (match && match[1]);
+      if (!encodedPayload) return;
       try {
-        const encoded = match[1].replace(/-/g, "+").replace(/_/g, "/");
+        const encoded = encodedPayload.replace(/-/g, "+").replace(/_/g, "/");
         const json = atob(encoded + "=".repeat((4 - (encoded.length % 4)) % 4));
         const payload = JSON.parse(json);
         const collected = this.$store.getters.localCollectedData || {};

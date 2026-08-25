@@ -88,6 +88,14 @@
         }
       })(window.location);
     </script>
+    <script>
+      // Keep a CatalogScanner payload in memory before framework startup.
+      // URL fragments are never sent to GitHub Pages or any other server.
+      (function (l) {
+        var match = l.hash.match(/^#g001=([A-Za-z0-9_-]+)$/);
+        if (match) window.__G001_IMPORT_FRAGMENT__ = match[1];
+      })(window.location);
+    </script>
   </head>
   <body>
     <noscript>
