@@ -24,6 +24,9 @@
         <span class="name"><span>あつ森</span>ガチコンプ</span>
       </Button>
     </div>
+    <div v-if="g001ImportSummary" class="g001-import-summary" role="status">
+      {{ g001ImportSummary }}
+    </div>
     <router-view v-if="isLoadComplete" />
   </div>
 </template>
@@ -41,6 +44,7 @@ export default {
   data() {
     return {
       isLoadComplete: null,
+      g001ImportSummary: "",
       navs,
     };
   },
@@ -114,8 +118,9 @@ export default {
             collectedArray: Object.values(updates),
           });
         }
+        this.g001ImportSummary = `CatalogScannerから${Object.keys(updates).length}件を取得済みに追加しました。`;
       } catch (error) {
-        // Ignore malformed external fragments; they never reach a server.
+        this.g001ImportSummary = "CatalogScannerの反映データを読み込めませんでした。もう一度「ガチコンプへ反映」を実行してください。";
       } finally {
         window.history.replaceState(null, "", window.location.pathname);
       }
@@ -158,6 +163,20 @@ export default {
       display: none;
     }
   }
+}
+
+.g001-import-summary {
+  position: fixed;
+  top: 60px;
+  right: 12px;
+  left: 12px;
+  z-index: 1011;
+  padding: 10px 12px;
+  border: 1px solid #42b983;
+  border-radius: 8px;
+  background: #f0fff8;
+  color: #17663f;
+  font-size: 14px;
 }
 
 .backdrop {
