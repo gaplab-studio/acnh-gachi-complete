@@ -4,8 +4,6 @@ import localforage from "localforage";
 import { extendPrototype } from "localforage-removeitems";
 extendPrototype(localforage);
 import VueLazyload from "vue-lazyload";
-import VueAnalytics from "vue-analytics";
-import VueGtag from "vue-gtag";
 import VueClipboard from "vue-clipboard2";
 import InfiniteLoading from "vue-infinite-loading";
 import PortalVue from "portal-vue";
@@ -16,8 +14,6 @@ import "./assets/styles.scss";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-import Auth from "./utils/auth";
-Auth.init();
 
 import ItemLengthWorker from "worker-loader!./workers/item_length_worker";
 Vue.prototype.$worker = new ItemLengthWorker();
@@ -26,17 +22,6 @@ Vue.config.productionTip = false;
 Vue.use(Vlf, localforage);
 Vue.use(VueLazyload);
 Vue.use(VueClipboard);
-Vue.use(VueAnalytics, {
-  id: "UA-173561585-1",
-  router,
-});
-Vue.use(
-  VueGtag,
-  {
-    config: { id: "G-2WC3P15NQ9" },
-  },
-  router
-);
 Vue.use(InfiniteLoading);
 Vue.use(PortalVue);
 

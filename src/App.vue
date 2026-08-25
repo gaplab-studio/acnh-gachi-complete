@@ -29,7 +29,6 @@
 </template>
 <script>
 import { navs } from "./utils/navs";
-import { syncData, loadFirebaseData } from "./utils/db.js";
 import Drawer from "./components/Drawer.vue";
 import Button from "./components/Button.vue";
 
@@ -51,31 +50,11 @@ export default {
     isOpenDrawer() {
       return this.$store.getters.isOpenDrawer;
     },
-    isLogin() {
-      return this.$store.getters.isLogin;
-    },
     localCollected() {
       return this.$store.getters.localCollectedData;
     },
-    cloudUpdateIndex() {
-      return this.$store.getters.cloudUpdateIndex;
-    },
-    isDoneSyncCloudFirstTime() {
-      return this.$store.getters.isDoneSyncCloudFirstTime;
-    },
     isSearchMode() {
       return this.$store.getters.isSearchMode;
-    },
-  },
-  watch: {
-    isLogin() {
-      loadFirebaseData();
-    },
-    cloudUpdateIndex() {
-      if (!this.isDoneSyncCloudFirstTime) {
-        syncData();
-        this.$store.commit("isDoneSyncCloudFirstTime", true);
-      }
     },
   },
   async created() {

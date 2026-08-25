@@ -1,211 +1,45 @@
 <template>
   <div class="login">
     <div class="login-header">
-      <h2 class="login-title">
-        <template v-if="isLogin">設定</template>
-        <template v-else>ログイン</template>
-      </h2>
-      <div class="close">
-        <CloseButton @click="close" />
-      </div>
+      <h2 class="login-title">ローカル設定・インポート</h2>
+      <div class="close"><CloseButton @click="close" /></div>
     </div>
     <div class="login-body">
-      <template v-if="isLogin && user">
-        <img :src="user.photoURL" alt="Avatar" class="avatar" />
-      </template>
-      <div v-else-if="isLogin === false" class="mb-6">
-        <p style="font-size: 14px">
-          ログインすると、データが自動的にクラウドに保存され、シェア機能を使えるようになります。
-        </p>
-        <Button block @click="login('google')">
-          <img
-            src="../assets/google.svg"
-            width="24px"
-            height="24px"
-            style="margin-right: 1rem"
-          />
-          Google でログイン
-        </Button>
-        <p style="font-size: 12px; margin-block: 2rem">
-          ※ Twitter でログインは 2023 年 6 月頃、Twitter API
-          の変更により使用できなくなりました。<br />Twitter
-          ログインでガチコンプを使用されていた方は、Google
-          ログインに切り替えた後で、 ご自身のガチコンプ ID
-          がお分かりの場合はデータをインポートすることができます。
-          詳しくは下部の「他のアカウントからインポート」をご覧ください。
-        </p>
-      </div>
-
+      <p class="local-note">取得状況はこの端末のブラウザ内だけに保存されます。ログインやクラウド同期は行いません。</p>
       <LoginCollected ref="loginCollected" />
-
       <LoginSettings :settings="settings" @change="changeSettings" />
-
-      <template v-if="isLogin && user">
-        <LoginName :userName="userName" @change="saveName" />
-        <LoginIslandName :islandName="islandName" @change="saveIslandName" />
-        <LoginShare />
-        <Card title="ID">
-          <p>{{ user.uid }}</p>
-          <p class="small">
-            あなたの固有IDです。シェア機能使用時の URL として使用されます。
-          </p>
-        </Card>
-      </template>
       <LoginCatalogScanner />
-      <LoginImportFromId />
-
-      <template v-if="isLogin && user">
-        <Button block @click="logout"> ログアウト </Button>
-        <p class="small mt-4">
-          ログアウトするとブラウザに保存されているデータはクリアされます。再度ログインすることで、クラウドからデータを復元できます。
-        </p>
-        <LoginDeleteAccount
-          :userName="userName"
-          :user="user"
-          :logout="logout"
-        />
-      </template>
     </div>
   </div>
 </template>
-<script>
-import firebase from "../plugins/firebase";
-import Auth from "../utils/auth";
-import { syncData } from "../utils/db.js";
 
+<script>
 import CloseButton from "../components/CloseButton";
-import Button from "../components/Button";
-import Card from "../components/Card";
-import LoginName from "../components/LoginName";
-import LoginIslandName from "../components/LoginIslandName";
-import LoginShare from "../components/LoginShare";
-import LoginImportFromId from "../components/LoginImportFromId";
 import LoginCollected from "../components/LoginCollected";
 import LoginCatalogScanner from "../components/LoginCatalogScanner";
 import LoginSettings from "../components/LoginSettings";
-import LoginDeleteAccount from "../components/LoginDeleteAccount";
-
-const db = firebase.firestore();
 
 export default {
   name: "Login",
-  components: {
-    CloseButton,
-    Button,
-    Card,
-    LoginName,
-    LoginIslandName,
-    LoginShare,
-    LoginImportFromId,
-    LoginCollected,
-    LoginCatalogScanner,
-    LoginSettings,
-    LoginDeleteAccount,
-  },
+  components: { CloseButton, LoginCollected, LoginCatalogScanner, LoginSettings },
   computed: {
-    user() {
-      return this.$store.getters.user;
-    },
-    userName() {
-      return this.$store.getters.userName;
-    },
-    islandName() {
-      return this.$store.getters.islandName;
-    },
-    isLogin() {
-      return this.$store.getters.isLogin;
-    },
-    settings() {
-      return this.$store.getters.settings;
-    },
+    settings() { return this.$store.getters.settings; },
   },
   methods: {
-    login(provider) {
-      Auth.login(provider, () => {
-        this.$emit("close");
-      });
-    },
-    logout() {
-      syncData();
-      Auth.logout();
-      this.$vlf
-        .removeItems([
-          "collected",
-          "wishlist",
-          "stocklist",
-          "updateIndex",
-          "islandName",
-          "filter",
-        ])
-        .then(() => {
-          window.location.reload();
-        });
-    },
     close() {
-      // コンプ率更新を中断
       this.$refs.loginCollected.abortUpdateCollected();
       this.$emit("close");
     },
-    saveName(newName) {
-      db.collection("users").doc(this.user.uid).update({
-        userName: newName,
-      });
-      this.$store.commit("updateUserName", newName);
-    },
-    saveIslandName(newName) {
-      db.collection("users").doc(this.user.uid).update({
-        islandName: newName,
-      });
-      this.$store.commit("updateIslandName", newName);
-    },
-    changeSettings(newValue) {
-      this.$store.commit("changeSettings", newValue);
-    },
+    changeSettings(newValue) { this.$store.commit("changeSettings", newValue); },
   },
 };
 </script>
+
 <style lang="scss" scoped>
-.login {
-  position: fixed;
-  z-index: 1100;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--app-body-bg);
-  overflow-y: auto;
-  user-select: text;
-}
-
-.login-header {
-  position: relative;
-  text-align: center;
-  padding: 0.5rem;
-  line-height: 64px;
-}
-
-.login-title {
-  margin-bottom: 0;
-}
-
-.close {
-  position: absolute;
-  top: 8px;
-  right: 16px;
-}
-
-.login-body {
-  padding: 1.5rem;
-  max-width: 600px;
-  margin-right: auto;
-  margin-left: auto;
-  text-align: center;
-}
-
-.avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  margin-bottom: 2rem;
-}
+.login { position: fixed; z-index: 1100; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--app-body-bg); overflow-y: auto; user-select: text; }
+.login-header { position: relative; text-align: center; padding: 0.5rem; line-height: 64px; }
+.login-title { margin-bottom: 0; }
+.close { position: absolute; top: 8px; right: 16px; }
+.login-body { padding: 1.5rem; max-width: 600px; margin-right: auto; margin-left: auto; text-align: center; }
+.local-note { font-size: 13px; font-weight: 700; }
 </style>

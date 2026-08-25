@@ -229,9 +229,8 @@ import ButtonRadio from "./ButtonRadio";
 import itemsJson from "../assets/items.json";
 import { zen_han_conv } from "../utils/utils";
 
-import firebase from "../plugins/firebase";
-
-const functions = firebase.functions();
+const remoteImportEnabled = false;
+const functions = null;
 
 export default {
   components: {
@@ -349,6 +348,10 @@ export default {
       });
     },
     onClickImport() {
+      if (!remoteImportEnabled) {
+        this.message = "この公開版では外部URLからの取り込みは無効です。下の「G001 CatalogScanner（ローカル結果）」を使用してください。";
+        return;
+      }
       this.message = "";
       this.failedNames = [];
       const inputArray = this.inputValue.split("/");
