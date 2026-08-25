@@ -202,6 +202,21 @@
     <div style="text-align: center">
       <Button cta @click="onClickImport">インポート</Button>
     </div>
+
+    <hr />
+    <h5>G001 CatalogScanner（ローカル結果）をインポート</h5>
+    <p>
+      G001 CatalogScanner の「ガチコンプ反映データをコピー」でコピーしたJSONを貼り付けます。通信は行わず、このブラウザの取得状況だけを更新します。既存の取得済み・配布可の状態は維持し、色やバリエーションが不明な項目は反映しません。
+    </p>
+    <Input
+      placeholder='{"English item name":"0",...}'
+      v-model="localInputValue"
+      @focus="$event.target.select()"
+      class="mb-4"
+    />
+    <div style="text-align: center">
+      <Button cta @click="onClickLocalImport">ローカル結果をインポート</Button>
+    </div>
   </Card>
 </template>
 
@@ -228,6 +243,7 @@ export default {
   data() {
     return {
       inputValue: "",
+      localInputValue: "",
       message: "",
       failedNames: [],
       isImportVariants: null,
@@ -269,6 +285,68 @@ export default {
     onChangeImportVariants(state) {
       this.isImportVariants = state;
       this.$vlf.setItem("isImportVariants", state);
+    },
+    onClickLocalImport() {
+      this.message = "";
+      this.failedNames = [];
+      let payload;
+      try {
+        payload = JSON.parse(this.localInputValue);
+      } catch (error) {
+        this.message = "貼り付けた反映データがJSON形式ではありません。CatalogScannerからコピーし直してください。";
+        return;
+      }
+
+      const isNameList = Array.isArray(payload && payload.names);
+      const entries = isNameList
+        ? payload.names.map((name) => [name, null])
+        : Object.entries(payload || {}).filter(([, value]) => value === "0");
+      if (entries.length === 0) {
+        this.message = "反映できる取得データがありません。";
+        return;
+      }
+
+      const collected = Object.assign({}, this.collected);
+      const updateItemsData = {};
+      const failedNames = [];
+      let hasVariableItem = 0;
+      for (const [sourceName] of entries) {
+        const catalogName = zen_han_conv(sourceName);
+        const item = itemsJson.find((candidate) => {
+          if (isNameList) {
+            return (
+              zen_han_conv(candidate.displayName) === catalogName &&
+              candidate.sourceSheet !== "Recipes"
+            );
+          }
+          return candidate.name === sourceName;
+        });
+        if (!item) {
+          failedNames.push(sourceName);
+          continue;
+        }
+        const itemLength = item.variants ? item.variants.length : 1;
+        if (itemLength !== 1) {
+          hasVariableItem++;
+          continue;
+        }
+        const itemkey = item.uniqueEntryId || item.name;
+        if ((collected[itemkey] || "") === "") {
+          updateItemsData[itemkey] = "0";
+        }
+      }
+
+      this.message = `G001の ${entries.length} 件から ${
+        Object.keys(updateItemsData).length
+      } 件を取得済みに追加しました。`;
+      if (hasVariableItem > 0) {
+        this.message += `色・バリエーションが不明な ${hasVariableItem} 件は反映していません。`;
+      }
+      this.failedNames = failedNames;
+      this.$store.commit("updateLocalCollectedDataBatch", {
+        items: Object.keys(updateItemsData),
+        collectedArray: Object.values(updateItemsData),
+      });
     },
     onClickImport() {
       this.message = "";
