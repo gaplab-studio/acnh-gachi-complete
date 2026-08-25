@@ -4,12 +4,7 @@
     :class="{ isSearchMode: isSearchMode, isWishlistMode: isWishlistMode }"
   >
     <div class="view-btn-wrapper" v-show="!isSearchMode && !isOpenDrawer">
-      <Button @click="openLogin(true)">
-        <template v-if="isLogin">
-          <img :src="user.photoURL" alt="Avatar" class="avatar" />
-        </template>
-        <template v-else-if="isLogin === false"> ログイン </template>
-      </Button>
+      <Button @click="openLogin(true)">設定・インポート</Button>
       <Button @click="onChangeView">
         <template v-if="filter.viewMode == 'list'">
           <img src="../assets/list.svg" />
