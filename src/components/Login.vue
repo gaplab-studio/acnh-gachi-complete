@@ -8,7 +8,6 @@
       <p class="local-note">取得状況はこの端末のブラウザ内だけに保存されます。ログインやクラウド同期は行いません。</p>
       <LoginCollected ref="loginCollected" />
       <LoginSettings :settings="settings" @change="changeSettings" />
-      <LoginCatalogScanner />
     </div>
   </div>
 </template>
@@ -16,12 +15,11 @@
 <script>
 import CloseButton from "../components/CloseButton";
 import LoginCollected from "../components/LoginCollected";
-import LoginCatalogScanner from "../components/LoginCatalogScanner";
 import LoginSettings from "../components/LoginSettings";
 
 export default {
   name: "Login",
-  components: { CloseButton, LoginCollected, LoginCatalogScanner, LoginSettings },
+  components: { CloseButton, LoginCollected, LoginSettings },
   computed: {
     settings() { return this.$store.getters.settings; },
   },

@@ -29,6 +29,7 @@
 </template>
 <script>
 import { navs } from "./utils/navs";
+import itemsJson from "./assets/items.json";
 import Drawer from "./components/Drawer.vue";
 import Button from "./components/Button.vue";
 
@@ -59,6 +60,7 @@ export default {
   },
   async created() {
     await Promise.all([this.loadLocalStorageData()]);
+    this.importG001Fragment();
     this.isLoadComplete = true;
   },
   methods: {
@@ -89,6 +91,34 @@ export default {
       self.$store.commit("initStocklist", stocklist);
       self.$store.commit("initPartnerlist", partnerlist);
       return self.localCollected;
+    },
+    importG001Fragment() {
+      const match = window.location.hash.match(/^#g001=([A-Za-z0-9_-]+)$/);
+      if (!match) return;
+      try {
+        const encoded = match[1].replace(/-/g, "+").replace(/_/g, "/");
+        const json = atob(encoded + "=".repeat((4 - (encoded.length % 4)) % 4));
+        const payload = JSON.parse(json);
+        const collected = this.$store.getters.localCollectedData || {};
+        const updates = {};
+        Object.entries(payload).forEach(([name, value]) => {
+          const item = itemsJson.find((candidate) => candidate.name === name);
+          if (value === "0" && item && (item.variants || []).length === 1) {
+            const key = item.uniqueEntryId || item.name;
+            if (!collected[key]) updates[key] = "0";
+          }
+        });
+        if (Object.keys(updates).length) {
+          this.$store.commit("updateLocalCollectedDataBatch", {
+            items: Object.keys(updates),
+            collectedArray: Object.values(updates),
+          });
+        }
+      } catch (error) {
+        // Ignore malformed external fragments; they never reach a server.
+      } finally {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
     },
   },
 };
