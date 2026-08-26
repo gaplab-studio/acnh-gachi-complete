@@ -14,6 +14,8 @@ import "./assets/styles.scss";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+import Auth from "./utils/auth";
+Auth.init();
 
 import ItemLengthWorker from "worker-loader!./workers/item_length_worker";
 Vue.prototype.$worker = new ItemLengthWorker();
