@@ -25,6 +25,14 @@ module.exports = {
       title: "あつ森ガチコンプ",
     },
   },
+  chainWebpack: config => {
+    // Terser 1.x uses OpenSSL MD4 for its optional disk cache.
+    // Keep minification enabled without enabling legacy crypto providers.
+    config.optimization.minimizer("terser").tap(args => {
+      args[0].cache = false;
+      return args;
+    });
+  },
   configureWebpack: () => {
     if (process.env.NODE_ENV === "production") {
       return {
