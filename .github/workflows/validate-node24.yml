@@ -1,0 +1,25 @@
+name: Validate Node.js 24 build
+
+on:
+  push:
+    branches: [fix/node24-build-20261021]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: node --version && npm --version
+      - run: npm ci
+      - run: npm run build
+      - name: Verify static output
+        run: test -s docs/index.html && test -d docs/js

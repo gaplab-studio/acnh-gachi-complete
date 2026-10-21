@@ -4,9 +4,12 @@
 
 ## セットアップ
 ```
-npm install
+npm ci
 ```
-※Node 16 で開発
+※Node.js 24.22.1（`.nvmrc`）を使用。Node.js を更新するときは `.nvmrc` も更新してください。
+
+webpack は Node.js 18 以降に対応した 4.47.0 を固定しています。`--openssl-legacy-provider` は使用しません。
+この更新は静的サイトのビルド環境のみが対象で、`functions/` の Firebase 設定・ランタイムは変更していません。
 
 ### 開発サーバの起動
 ```

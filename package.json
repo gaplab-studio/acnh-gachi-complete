@@ -58,6 +58,7 @@
     "sass-loader": "^8.0.2",
     "vue-analytics": "^5.22.1",
     "vue-template-compiler": "^2.6.11",
+    "webpack": "4.47.0",
     "worker-loader": "^3.0.8"
   }
 }
